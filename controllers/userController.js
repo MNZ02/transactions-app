@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import Bank from '../models/Bank.js'
 import { signupSchema, signinSchema } from '../schemas/userSchemas.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -18,7 +19,13 @@ export const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await User.create({ username, firstName, lastName, password: hashedPassword, })
+    const user = await User.create({ username, firstName, lastName, password: hashedPassword })
+
+
+    //random balance
+    const balance = Math.floor(Math.random() * 10000) + 1
+    const userId = user._id
+    await Bank.create({ userId, balance })
 
     const token = jwt.sign({ username: username }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
 
@@ -67,4 +74,62 @@ export const signin = async (req, res) => {
   }
 }
 
+export const updateUserById = async (req, res) => {
+  const { userId } = req.params
+  console.log(userId)
 
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true })
+
+    if (!updatedUser) {
+      return res.status(404).send('User not found')
+    }
+
+    res.status(200).json(updatedUser)
+  } catch (error) {
+    console.error('Error updating user', error.message)
+    res.status(500).send('Internal server error')
+  }
+}
+
+
+export const getUserBulk = async (req, res) => {
+  try {
+    const { filter } = req.query;
+
+
+    if (!filter) {
+      return res.status(400).send('Query parameter missing');
+    }
+
+    const results = await User.find({
+      $or: [
+        {
+          firstName: {
+            "$regex": filter
+          }
+        },
+        {
+          lastName: {
+            "$regex": filter
+          }
+        }
+      ]
+    })
+
+    const result = results.map(user => (
+      {
+
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id
+      }
+    ))
+    res.json(result)
+
+  } catch (error) {
+    console.error('Error filtering user', error.message)
+    res.status(500).send('Internal server error')
+  }
+}

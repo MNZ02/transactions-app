@@ -4,6 +4,7 @@ import 'dotenv/config'
 import { MongoClient } from 'mongodb'
 import mainRoute from './routes/index.js'
 import userRoutes from './routes/userRoutes.js'
+import accountRoutes from './routes/accountRoutes.js'
 import cors from 'cors'
 const app = express()
 const port = 3000
@@ -14,7 +15,7 @@ app.use(cors({
 }))
 
 app.use('/api/v1', userRoutes)
-
+app.use('/api/v1/account', accountRoutes)
 
 const client = new MongoClient(process.env.MONGODB_URI)
 
