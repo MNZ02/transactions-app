@@ -6,6 +6,6 @@ const router = express.Router()
 router.post('/signup', signup)
 router.post('/signin', signin)
 router.put('/update-user/:userId', verifyToken, updateUserById)
-router.get('/user/bulk', getUserBulk)
+router.get('/user/bulk', verifyToken, getUserBulk)
 
 export default router

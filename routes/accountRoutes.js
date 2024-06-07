@@ -1,8 +1,9 @@
 import express from 'express'
-import { getBalance } from '../controllers/accountController.js'
+import { getBalance, transfer } from '../controllers/accountController.js'
+import auth from '../middleware/auth.js'
 const router = express.Router()
 
-router.get('/get-balance/:userId', getBalance)
-
+router.get('/get-balance/:userId', auth, getBalance)
+router.post('/transfer', auth, transfer)
 
 export default router

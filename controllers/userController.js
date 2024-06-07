@@ -27,7 +27,7 @@ export const signup = async (req, res) => {
     const userId = user._id
     await Bank.create({ userId, balance })
 
-    const token = jwt.sign({ username: username }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
+    const token = jwt.sign({ username: username, userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
 
     return res.status(201).json({ message: 'User created', token })
   } catch (error) {
@@ -62,7 +62,7 @@ export const signin = async (req, res) => {
       return res.status(403).send('Invalid credentials')
     }
 
-    const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ username: user.username, userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: '1h'
     })
 
