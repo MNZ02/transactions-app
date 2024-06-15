@@ -23,6 +23,7 @@ function SignIn () {
       })
       console.log('User signed in', response.data)
       if (response.data) {
+        localStorage.setItem('token', response.data.token)
         navigate('/dashboard')
       }
     } catch (error) {
